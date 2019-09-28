@@ -16,6 +16,10 @@
 #include <QProcess>
 #include <QMessageBox>
 #include <QMenuBar>
+#include <QDir>
+#include <QStandardPaths>
+#include <QFileInfo>
+#include <QDateTime>
 
 extern QMediaPlayer *mediaPlayer;
 extern LyricWindow  *lyricWindow;
@@ -24,6 +28,30 @@ extern QString path2name(QString);
 extern QString readableFileName(QString fileName);
 
 static bool changing = false;
+
+void decodeAudio(QString file)
+{
+   QString dir      = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+   QString fileName = readableFileName(file);
+
+   QFileInfo decoded(dir + "/" + fileName + ".wav");
+   QFileInfo encoded(file);
+
+   if (decoded.exists() && (decoded.lastModified() > encoded.lastModified()))
+   {
+      return;
+   }
+
+   QFile::remove(dir + "/" + fileName + ".wav");
+   QProcess process;
+   process.setProgram("ffmpeg.exe");
+   QStringList arguments;
+   arguments << "-i" << file << dir + "/" + fileName + ".wav";
+   process.setArguments(arguments);
+   process.start();
+   process.waitForFinished();
+}
+
 
 ListWindow::ListWindow(QWidget *parent) :
    QMainWindow(parent),
@@ -163,7 +191,8 @@ ListWindow::ListWindow(QWidget *parent) :
       if (currentIndex.isValid())
       {
          QString musicName = this->musicList.at(currentIndex.row());
-         mediaPlayer->setMedia(QUrl::fromLocalFile(MUSIC_DIR + musicName));
+         decodeAudio(MUSIC_DIR + musicName);
+         mediaPlayer->setMedia(QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/" + readableFileName(musicName) + ".wav"));
          mediaPlayer->play();
       }
       else
@@ -176,7 +205,8 @@ ListWindow::ListWindow(QWidget *parent) :
       {
          changing          = true;
          QString musicName = this->musicList.at(index.row());
-         mediaPlayer->setMedia(QUrl::fromLocalFile(MUSIC_DIR + musicName));
+         decodeAudio(MUSIC_DIR + musicName);
+         mediaPlayer->setMedia(QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/" + readableFileName(musicName) + ".wav"));
          mediaPlayer->play();
       }
    });
@@ -224,7 +254,7 @@ ListWindow::ListWindow(QWidget *parent) :
          }
          if (repeatAction->isChecked())
          {
-            mediaPlayer->setMedia(mediaPlayer->media());
+            mediaPlayer->setPosition(0);
             mediaPlayer->play();
          }
          else
@@ -307,7 +337,7 @@ void ListWindow::loadMusicList()
    QDir        dir(MUSIC_DIR);
    QStringList filterList;
 
-   filterList << "*.wav" << "*.mp3" << "*.ogg";
+   filterList << "*.wav" << "*.mp3" << "*.ogg" << "*.flac" << "*.aac" << "*.m4a";
    this->musicList = dir.entryList(filterList, QDir::Files | QDir::Readable, QDir::Name);
 
    QAbstractItemModel *model = ui->musicList->model();
@@ -335,7 +365,8 @@ void ListWindow::randomPlay()
    int     index     = rand() % size;
    QString musicName = this->musicList.at(index);
    // 播放
-   mediaPlayer->setMedia(QUrl::fromLocalFile(MUSIC_DIR + musicName));
+   decodeAudio(MUSIC_DIR + musicName);
+   mediaPlayer->setMedia(QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/" + readableFileName(musicName) + ".wav"));
    mediaPlayer->play();
 }
 

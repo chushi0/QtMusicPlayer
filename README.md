@@ -22,6 +22,7 @@
 4. 将上述两个依赖库的dll文件复制到MusicPlayer.exe所在文件夹
 5. 将文件[icon.ico](https://github.com/chushi0/QtMusicPlayer/blob/master/icon.ico)复制到MusicPlayer.exe所在文件夹
 6. 将项目[MusicWithLrc](https://github.com/chushi0/MusicWithLrc)导出为music.jar，复制到MusicPlayer.exe所在文件夹（可选）
-7. 将项目[QtMusicPlayer_AdjustMusic](https://github.com/chushi0/QtMusicPlayer_AdjustMusic)导出为AdjustMusic.exe，复制到MusicPlayer.exe所在文件夹（可选）
-8. 在MusicPlayer.exe所在文件夹中创建music和lrc文件夹。其中music文件夹存放音乐，lrc文件夹存放歌词（建议使用`mklink`命令链接到常用目录）
-9. 运行MusicPlayer.exe
+7. 下载[ffmpeg](https://github.com/ffmpeg/ffmpeg)，将ffmpeg.exe复制到MusicPlayer.exe所在文件夹
+8. 将项目[QtMusicPlayer_AdjustMusic](https://github.com/chushi0/QtMusicPlayer_AdjustMusic)导出为AdjustMusic.exe，复制到MusicPlayer.exe所在文件夹（可选）
+9. 在MusicPlayer.exe所在文件夹中创建music和lrc文件夹。其中music文件夹存放音乐，lrc文件夹存放歌词（建议使用`mklink`命令链接到常用目录）
+10. 运行MusicPlayer.exe
